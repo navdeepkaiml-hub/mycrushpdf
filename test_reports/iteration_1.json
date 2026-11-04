@@ -1,0 +1,66 @@
+{
+  "summary": "First full pass. Backend: 35 pytest cases, 28 passed (80%). All 6 in-scope tools work on valid input and produce correct output: merge order is right, split zip pages are right, remove-pages drops the right pages, organize order is right, jpg-to-pdf gives one page per image in the right order. Jobs and download endpoints work. Auth works (login with httpOnly cookie, /me, wrong password gives 401, logout). Unauthenticated calls to all /api/admin/* endpoints get 401. The failures are all in error handling: validation errors come back as HTTP 500 instead of 400. Compress levels have no effect. Frontend: all 25 routes load. Each page has a unique title, a meta description and a canonical URL. JSON-LD is on home, FAQ, tool pages and articles. All 6 tools ran end-to-end in the UI, including the download. No horizontal overflow at 390px. Mobile menu, contact form, admin login/dashboard/tabs/SEO save and logout all work. No broken internal links.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "ALL /api/tools/* (validate_pdf / validate_image)", "issue": "pdf.ProcessingError is raised in the endpoint body, outside run_tool's try/except, and nothing handles it. A non-PDF renamed to .pdf, a corrupted PDF, an encrypted PDF, a PDF over the 500-page limit, or a non-image sent to jpg-to-pdf all return HTTP 500 'Internal Server Error'. The UI then shows the generic 'Something went wrong'. Fix: add @app.exception_handler(pdf.ProcessingError) that returns 400 with {detail: str(e)}.", "priority": "CRITICAL"},
+      {"endpoint": "POST /api/tools/remove-pages, organize, split(ranges)", "issue": "Page specs that are not numbers ('abc', '1-', 'x,y', 'a-b') raise ValueError from int(), which is caught as a generic Exception, so the response is 500 'An unexpected error occurred'. They should be 400 with a clear message. Wrap the parsing in _parse_pages, organize_pdf and split_pdf and raise ProcessingError.", "priority": "HIGH"},
+      {"endpoint": "POST /api/tools/remove-pages (_parse_pages)", "issue": "Possible DoS (found in code review, not executed). A huge range like '1-999999999' fills a Python list with every page index before the bounds check runs. This can exhaust memory and kill the worker. Check the bounds before expanding the range.", "priority": "HIGH"},
+      {"endpoint": "POST /api/tools/compress", "issue": "Image recompression never runs. pdf_processing.py line 111 reads `doc.update_stream(...) if False else None`, which is a no-op. low, medium and high all produce byte-identical output (tested: 8.6MB to 4.1MB for every level, only from deflate/garbage). Scanned or photo-heavy PDFs will barely shrink, and the level selector does nothing. Replace the images, for example with page.replace_image(xref, stream=...). Also return the original if the output is larger.", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/tools/remove-pages", "issue": "A reversed range like '3-1' is silently ignored: 200 with no pages removed. Split rejects the same input correctly."},
+      {"endpoint": "CORS (server.py)", "issue": "CORS_ORIGINS='*' with allow_credentials=True. Starlette reflects any Origin (verified: evil.com gets ACAO plus credentials=true). Together with the SameSite=None cookie, any site can make credentialed calls to the admin endpoints. Set explicit origins."},
+      {"endpoint": "slowapi limiter", "issue": "get_remote_address uses the proxy/ingress IP (Firebase/Cloud Run/k8s). All users share one 20/min-per-tool bucket, so in production legitimate users will get 429s. Use X-Forwarded-For. The login lockout key has the same problem."},
+      {"endpoint": "auth.seed_admin", "issue": "Hardcoded fallback ADMIN_PASSWORD 'admin123' and a default email. Remove the defaults. Seeding is idempotent and does not overwrite an existing admin (OK)."},
+      {"endpoint": "read_upload", "issue": "The whole upload is read into memory before the 50MB check, and there is no request-body size limit at the server or proxy level."},
+      {"endpoint": "admin stats", "issue": "Validation failures (fake PDF and so on) happen before run_tool, so they are not counted as total or failed in tool_stats."},
+      {"endpoint": "/sitemap.xml, /robots.txt, /ads.txt", "issue": "These are root-level backend routes. In preview, ingress sends them to the frontend, which returns text/html for the SPA. No /api alias exists, so they could not be verified through the public URL. They only work in production if firebase.json rewrites them to Cloud Run."},
+      {"endpoint": "/api/contact", "issue": "There is no delete endpoint, so the test contacts could not be removed (see seed_data_creation)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ToolRunner.addFiles", "issue": "setError(oversize msg) is immediately followed by setError(''), so the '>50MB' error is never shown. The file is just dropped silently.", "selector": "[data-testid='tool-error']", "priority": "MEDIUM"},
+      {"component": "Header mobile menu", "issue": "POPULAR_SLUGS shows pdf-to-word and rotate-pdf (out of scope) but leaves out the Phase-1 tools Remove PDF Pages and Organize PDF.", "selector": "[data-testid^='mobile-tool-']", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Admin SEO tab", "issue": "SEO home title/description is saved and persists (verified). But no frontend page reads config.seo: the home <title> stayed the same after saving 'TEST_title'. The setting has no effect.", "affected_selectors": ["[data-testid='seo-home-title']", "[data-testid='save-seo']"]},
+      {"flow": "Tool error display", "issue": "Because of the backend 500s, uploading a fake PDF shows 'Something went wrong. Please try again.' and a bad page spec shows 'An unexpected error occurred'. Users get no useful message.", "affected_selectors": ["[data-testid='tool-error']"]}
+    ],
+    "design_issues": [
+      {"screen": "SEO / deployment", "issues": ["The SPA renders meta and JSON-LD client-side only. Non-JS crawlers get the home meta from index.html on every route. Consider prerendering (react-snap or similar) for Firebase static hosting."]}
+    ]
+  },
+  "deployment_review": [
+    "firebase.json rewrites /api/**, /sitemap.xml, /robots.txt and /ads.txt to Cloud Run service 'mycrushpdf-api'. The app is therefore NOT zero-cost static hosting: it needs a Cloud Run backend (server-side PyMuPDF processing plus MongoDB). For a static-only setup, ship sitemap.xml, robots.txt and ads.txt as files in public/ (dist).",
+    "Firebase 'public': 'dist', but CRA/craco builds to 'build/' by default. Check the build output folder, otherwise the deploy will be empty."
+  ],
+  "legal_consistency": "The 60-minute retention stated in legal.js, tools.js and the ToolRunner UI matches FILE_RETENTION_MINUTES=60. Downloads are refused after expiry (410). Physical deletion runs every 5 minutes, so files can live up to about 65 minutes. That slightly contradicts 'deleted within 60 minutes'. Either say 'about 1 hour' or run the cleanup loop more often. Uploaded inputs are never written to disk (in-memory only), which matches the privacy text.",
+  "test_report_links": ["/app/backend/tests/test_mycrushpdf_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Add an exception handler for pdf.ProcessingError that returns 400 (fixes 500s on invalid PDFs/images, encrypted PDFs and the page-limit check)",
+    "Validate non-numeric page specs in _parse_pages, organize_pdf and split_pdf: raise ProcessingError instead of letting ValueError become a 500",
+    "Check range bounds before expanding them in _parse_pages (DoS); reject reversed ranges in remove-pages",
+    "Fix compress_pdf so images are actually replaced (remove the `if False` no-op) and make the levels differ; return the original if the output is larger",
+    "Fix ToolRunner addFiles so the oversize error is not cleared",
+    "Either wire admin SEO settings into the Seo component or remove the tab",
+    "Set explicit CORS_ORIGINS; make the rate limiter/lockout read X-Forwarded-For",
+    "Remove the hardcoded admin123 fallback in seed_admin",
+    "Mobile menu: show Remove Pages and Organize",
+    "firebase.json: decide on Cloud Run vs static; check that 'dist' matches the build dir"
+  ],
+  "critical_code_review_comments": [
+    "pdf_processing.py:111 dead-code no-op makes compression levels meaningless",
+    "server.py: validate_* is called outside run_tool's error handling, so 500s occur",
+    "ToolRunner.jsx:28-38 setError race; lines 79-83 are an empty loop (dead code)",
+    "CORS '*' plus credentials plus a SameSite=None cookie is a CSRF risk on admin PUT endpoints",
+    "The note in review_request says admin123, but the real password is CrushPDF@2026 (from test_credentials.md and .env)"
+  ],
+  "updated_files": ["/app/backend/tests/test_mycrushpdf_api.py"],
+  "success_rate": {"backend": "80% (28/35)", "frontend": "95% (all flows work; error messaging is degraded by the backend 500s)"},
+  "test_credentials": "admin@mycrushpdf.com / CrushPDF@2026 (works). admin123 does NOT work.",
+  "seed_data_creation": "Created 2 contact messages (TEST_user via the API, TEST_ui via the UI). There is no delete endpoint, so they remain in the contacts collection. Tool jobs expire automatically. Admin settings were set to {TEST_key: v} and the SEO home title was changed to TEST_title; the SEO title was restored to its original empty value. Settings were reset to {} afterwards (originally the key did not exist). The SEO key now exists as {home_title: ''}.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: REACT_APP_BACKEND_URL=... pytest /app/backend/tests/test_mycrushpdf_api.py. The 7 current failures are all 500-vs-400 error handling. Sample files are generated in the test code. The traversal test accepts 200 because ingress normalizes '../' to the SPA. Do not test a huge range like '1-999999999' live, because it can OOM the backend."
+}

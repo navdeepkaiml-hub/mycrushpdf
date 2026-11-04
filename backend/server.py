@@ -7,7 +7,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
 from fastapi import FastAPI, APIRouter, UploadFile, File, Form, HTTPException, Request, Depends
-from fastapi.responses import Response, PlainTextResponse
+from fastapi.responses import Response, PlainTextResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
@@ -29,10 +29,20 @@ MAX_FILE_SIZE = int(os.environ.get("MAX_FILE_SIZE_MB", "50")) * 1024 * 1024
 MAX_PAGES = int(os.environ.get("MAX_PAGE_COUNT", "500"))
 SITE_URL = "https://mycrushpdf.com"
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["120/minute"])
+def client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for")
+    return fwd.split(",")[0].strip() if fwd else get_remote_address(request)
+
+
+limiter = Limiter(key_func=client_ip, default_limits=["120/minute"])
 app = FastAPI(title="mycrushpdf API")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(pdf.ProcessingError)
+async def processing_error_handler(request: Request, exc: pdf.ProcessingError):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
 
 api_router = APIRouter(prefix="/api")
 
@@ -351,8 +361,8 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_credentials=os.environ["CORS_ORIGINS"] != "*",
+    allow_origins=os.environ["CORS_ORIGINS"].split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -374,7 +384,7 @@ async def _cleanup_loop():
             await storage.cleanup_expired()
         except Exception:
             logger.exception("cleanup loop error")
-        await asyncio.sleep(300)
+        await asyncio.sleep(60)
 
 
 @app.on_event("startup")

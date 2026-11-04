@@ -333,7 +333,7 @@ export const TOOLS = [
   },
 ];
 
-export const POPULAR_SLUGS = ["merge-pdf", "compress-pdf", "split-pdf", "jpg-to-pdf", "pdf-to-word", "rotate-pdf"];
+export const POPULAR_SLUGS = ["merge-pdf", "compress-pdf", "split-pdf", "remove-pdf-pages", "organize-pdf", "jpg-to-pdf"];
 
 export function getTool(slug) {
   return TOOLS.find((t) => t.slug === slug);

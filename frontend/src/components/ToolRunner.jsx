@@ -27,14 +27,15 @@ export default function ToolRunner({ tool }) {
 
   const addFiles = (newOnes) => {
     const valid = [];
+    let err = "";
     for (const f of newOnes) {
       if (f.size > MAX_MB * 1024 * 1024) {
-        setError(`"${f.name}" exceeds the ${MAX_MB}MB limit.`);
+        err = `"${f.name}" exceeds the ${MAX_MB}MB limit.`;
         continue;
       }
       valid.push(f);
     }
-    setError("");
+    setError(err);
     setFiles((prev) => (tool.multiple ? [...prev, ...valid] : valid.slice(0, 1)));
   };
 
@@ -75,12 +76,6 @@ export default function ToolRunner({ tool }) {
         fd.append("file", files[0]);
       }
       visibleOptions.forEach((o) => fd.append(o.key, opts[o.key] ?? ""));
-      // Non-visible options with defaults still sent so backend has required values
-      (tool.options || []).forEach((o) => {
-        if (!visibleOptions.includes(o) && opts[o.key] != null && o.key !== "ranges") {
-          // skip hidden conditional text; backend defaults handle it
-        }
-      });
       const { data } = await api.post(`/tools/${tool.endpoint}`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });

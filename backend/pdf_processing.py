@@ -48,6 +48,12 @@ def validate_image(data: bytes) -> None:
         raise ProcessingError("One of the files is not a valid image.")
 
 
+def _to_int(x: str) -> int:
+    if not x.isdigit():
+        raise ProcessingError(f"'{x}' is not a valid page number.")
+    return int(x)
+
+
 def _parse_pages(spec: str, total: int) -> List[int]:
     """Parse '1,3,5-7' into zero-based page indices."""
     result: List[int] = []
@@ -56,14 +62,19 @@ def _parse_pages(spec: str, total: int) -> List[int]:
             continue
         if "-" in part:
             a, b = part.split("-", 1)
-            start, end = int(a), int(b)
-            for p in range(start, end + 1):
-                result.append(p - 1)
+            start, end = _to_int(a), _to_int(b)
+            if start > end:
+                raise ProcessingError(f"Invalid range '{part}'.")
+            if start < 1 or end > total:
+                raise ProcessingError(f"Page number out of range (document has {total} pages).")
+            result.extend(range(start - 1, end))
         else:
-            result.append(int(part) - 1)
-    for p in result:
-        if p < 0 or p >= total:
-            raise ProcessingError(f"Page number out of range (document has {total} pages).")
+            p = _to_int(part)
+            if p < 1 or p > total:
+                raise ProcessingError(f"Page number out of range (document has {total} pages).")
+            result.append(p - 1)
+    if not result:
+        raise ProcessingError("Please enter at least one page number.")
     return result
 
 
@@ -85,39 +96,36 @@ def merge_pdfs(files: List[bytes]) -> bytes:
 
 def compress_pdf(data: bytes, level: str = "medium") -> bytes:
     doc = fitz.open(stream=data, filetype="pdf")
-    # Downsample embedded images based on level
-    dpi_map = {"low": 150, "medium": 110, "high": 72}
-    target_dpi = dpi_map.get(level, 110)
-    quality_map = {"low": 80, "medium": 60, "high": 40}
-    quality = quality_map.get(level, 60)
-    try:
-        for page in doc:
-            for img in page.get_images(full=True):
-                xref = img[0]
-                try:
-                    base = doc.extract_image(xref)
-                    pix = fitz.Pixmap(doc, xref)
-                    if pix.width < 400 and pix.height < 400:
-                        pix = None
-                        continue
-                    if pix.n >= 5:  # CMYK/alpha → convert to RGB
-                        pix = fitz.Pixmap(fitz.csRGB, pix)
-                    img_pil = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                    scale = min(1.0, target_dpi / 150.0)
-                    new_size = (max(1, int(pix.width * scale)), max(1, int(pix.height * scale)))
-                    img_pil = img_pil.resize(new_size, Image.LANCZOS)
-                    buf = io.BytesIO()
-                    img_pil.save(buf, format="JPEG", quality=quality, optimize=True)
-                    doc.update_stream(xref, buf.getvalue()) if False else None
-                    pix = None
-                except Exception:
+    max_dim = {"low": 2000, "medium": 1400, "high": 1000}.get(level, 1400)
+    quality = {"low": 80, "medium": 60, "high": 40}.get(level, 60)
+    done = set()
+    for page in doc:
+        for img in page.get_images(full=True):
+            xref, smask = img[0], img[1]
+            if xref in done or smask:
+                continue
+            done.add(xref)
+            try:
+                pix = fitz.Pixmap(doc, xref)
+                if pix.width < 300 and pix.height < 300:
                     continue
-    except Exception:
-        pass
+                if pix.n - pix.alpha != 3:
+                    pix = fitz.Pixmap(fitz.csRGB, pix)
+                if pix.alpha:
+                    pix = fitz.Pixmap(pix, 0)
+                img_pil = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                img_pil.thumbnail((max_dim, max_dim), Image.LANCZOS)
+                buf = io.BytesIO()
+                img_pil.save(buf, format="JPEG", quality=quality, optimize=True)
+                if len(buf.getvalue()) < len(doc.xref_stream_raw(xref) or b""):
+                    page.replace_image(xref, stream=buf.getvalue())
+            except Exception:
+                continue
     out = io.BytesIO()
     doc.save(out, garbage=4, deflate=True, clean=True, deflate_images=True, deflate_fonts=True)
     doc.close()
-    return out.getvalue()
+    result = out.getvalue()
+    return result if len(result) < len(data) else data
 
 
 def split_pdf(data: bytes, mode: str = "all", ranges: str = "") -> bytes:
@@ -136,9 +144,9 @@ def split_pdf(data: bytes, mode: str = "all", ranges: str = "") -> bytes:
                     continue
                 if "-" in part:
                     a, b = part.split("-", 1)
-                    start, end = int(a) - 1, int(b)
+                    start, end = _to_int(a) - 1, _to_int(b)
                 else:
-                    start, end = int(part) - 1, int(part)
+                    start, end = _to_int(part) - 1, _to_int(part)
                 if start < 0 or end > total or start >= end:
                     raise ProcessingError(f"Invalid range '{part}'.")
                 writer = PdfWriter()
@@ -176,7 +184,7 @@ def organize_pdf(data: bytes, order_spec: str) -> bytes:
     """order_spec: comma-separated 1-based page numbers in desired order."""
     reader = PdfReader(io.BytesIO(data))
     total = len(reader.pages)
-    order = [int(x) - 1 for x in order_spec.replace(" ", "").split(",") if x]
+    order = [_to_int(x) - 1 for x in order_spec.replace(" ", "").split(",") if x]
     if not order:
         raise ProcessingError("No page order provided.")
     for p in order:

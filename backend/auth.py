@@ -71,7 +71,8 @@ async def get_current_admin(request: Request) -> dict:
 @auth_router.post("/login")
 async def login(data: LoginInput, request: Request, response: Response):
     email = data.email.lower()
-    ip = request.client.host if request.client else "unknown"
+    fwd = request.headers.get("x-forwarded-for")
+    ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
     identifier = f"{ip}:{email}"
 
     attempts = await repo.get_attempts(identifier)
@@ -110,8 +111,8 @@ async def me(admin: dict = Depends(get_current_admin)):
 
 
 async def seed_admin():
-    email = os.environ.get("ADMIN_EMAIL", "admin@mycrushpdf.com").lower()
-    password = os.environ.get("ADMIN_PASSWORD", "admin123")
+    email = os.environ["ADMIN_EMAIL"].lower()
+    password = os.environ["ADMIN_PASSWORD"]
     existing = await repo.find_user_by_email(email)
     if existing is None:
         await repo.insert_user({
