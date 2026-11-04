@@ -1,0 +1,77 @@
+{
+  "app_name": "mycrushpdf",
+  "context": "Professional online PDF utility platform (merge, compress, split, convert, rotate, organize, etc.)",
+  "archetype": "ORGANIC & EARTHY / PERFORMANCE PRO hybrid (Clean white background, modern indigo/violet #6366F1 / #4F46E5 accents, slate-900 typography)",
+  "typography": {
+    "heading_font": "Plus Jakarta Sans",
+    "body_font": "Inter / Plus Jakarta Sans",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight font-extrabold",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-bold",
+      "h3": "text-xl sm:text-2xl font-semibold",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed text-slate-600",
+      "small": "text-sm text-slate-500"
+    }
+  },
+  "colors": {
+    "background": "#F8FAFC",
+    "surface": "#FFFFFF",
+    "primary": "#4F46E5",
+    "primary_hover": "#4338CA",
+    "accent": "#6366F1",
+    "text_main": "#0F172A",
+    "text_muted": "#64748B",
+    "border": "#E2E8F0",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "error": "#EF4444"
+  },
+  "surfaces": {
+    "header": "backdrop-blur-xl bg-white/80 border-b border-slate-200 sticky top-0 z-50",
+    "card": "bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200",
+    "upload_dropzone": "border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/50 rounded-3xl p-12 text-center transition-all cursor-pointer"
+  },
+  "component_path": "/app/frontend/src/components/",
+  "image_urls": [
+    {
+      "category": "hero_abstract",
+      "url": "https://images.unsplash.com/photo-1684503830679-302965124d97?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBtb2Rlcm4lMjBhYnN0cmFjdCUyMGRvY3VtZW50JTIwcHJvY2Vzc2luZyUyMHRlY2hub2xvZ3klMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc5MzgyMTU5NHww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract modern technology background for hero and security sections"
+    }
+  ],
+  "pages_and_routes": [
+    { "path": "/", "name": "Homepage" },
+    { "path": "/merge-pdf", "name": "Merge PDF" },
+    { "path": "/compress-pdf", "name": "Compress PDF" },
+    { "path": "/split-pdf", "name": "Split PDF" },
+    { "path": "/remove-pdf-pages", "name": "Remove Pages" },
+    { "path": "/organize-pdf", "name": "Organize PDF" },
+    { "path": "/jpg-to-pdf", "name": "JPG to PDF" },
+    { "path": "/pdf-to-word", "name": "PDF to Word" },
+    { "path": "/rotate-pdf", "name": "Rotate PDF" },
+    { "path": "/all-tools", "name": "All Tools Directory" },
+    { "path": "/blog", "name": "Blog & Guides" },
+    { "path": "/blog/:slug", "name": "Blog Article Detail" },
+    { "path": "/pricing", "name": "Pricing & Pro" },
+    { "path": "/privacy", "name": "Privacy Policy" },
+    { "path": "/terms", "name": "Terms of Service" },
+    { "path": "/faq", "name": "FAQ" },
+    { "path": "/admin/login", "name": "Admin Login" },
+    { "path": "/admin/dashboard", "name": "Admin Dashboard" }
+  ],
+  "key_features": [
+    "Drag-and-drop multi-file upload with instant file cards",
+    "Simulated client-side/server-side PDF processing pipeline with real-time progress bars",
+    "Interactive options for each tool (compression level, page range selector, rotate degree, reorder)",
+    "Download result button with instant mock generated file download",
+    "Tool categorization (Organize, Convert, Edit, Secure)",
+    "Admin dashboard with stats cards, recent conversion logs, and tool enable/disable toggles",
+    "Full responsive navigation, SEO metadata, breadcrumbs, FAQ accordions, blog articles, and legal pages"
+  ],
+  "accessibility_and_testing": {
+    "data_testid_required": true,
+    "keyboard_navigation": "Fully focusable interactive elements",
+    "contrast_compliance": "WCAG AA minimum for all text and UI elements"
+  }
+}
