@@ -64,8 +64,10 @@ npm run preview      # local production preview
 ```bash
 npm install -g firebase-tools
 firebase login
-firebase init hosting        # choose existing/new project, public dir = dist, SPA = yes
+firebase init hosting        # public dir = build (current CRA app: `yarn build`) — change to dist only after the optional Vite migration
 ```
+
+> Zero-cost note: Firebase Hosting (Spark plan) serves the static site, sitemap.xml, robots.txt and ads.txt for free from `frontend/public`. The PDF tools need the Python backend; the `/api/**` rewrite to Cloud Run only takes effect if you later create that service (Cloud Run requires the Blaze plan). Nothing paid is activated by this config.
 
 `firebase.json` is already provided at the repo root with:
 - SPA fallback to `index.html`

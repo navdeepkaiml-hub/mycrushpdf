@@ -71,9 +71,7 @@ async def get_current_admin(request: Request) -> dict:
 @auth_router.post("/login")
 async def login(data: LoginInput, request: Request, response: Response):
     email = data.email.lower()
-    fwd = request.headers.get("x-forwarded-for")
-    ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
-    identifier = f"{ip}:{email}"
+    identifier = email
 
     attempts = await repo.get_attempts(identifier)
     if attempts and attempts.get("count", 0) >= LOCKOUT_THRESHOLD:

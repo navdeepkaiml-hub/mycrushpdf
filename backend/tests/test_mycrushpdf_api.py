@@ -213,3 +213,92 @@ class TestAuthAdmin:
     def test_public_config(self):
         r = requests.get(f"{BASE_URL}/api/config/public")
         assert r.status_code == 200 and "tools_enabled" in r.json()
+
+
+# ---- Iteration 2 regression: error details, bounds, compress levels, static files ----
+def make_photo_pdf(n=3):
+    doc = fitz.open()
+    for i in range(n):
+        page = doc.new_page()
+        img = Image.radial_gradient("L").resize((2400, 2400)).convert("RGB")
+        noise = Image.effect_noise((2400, 2400), 40).convert("RGB")
+        img = Image.blend(img, noise, 0.4)
+        b = io.BytesIO(); img.save(b, "JPEG", quality=95)
+        page.insert_image(page.rect, stream=b.getvalue())
+    out = doc.tobytes(); doc.close()
+    return out
+
+
+class TestIter2:
+    def _post(self, tool, data_bytes, data=None, name="a.pdf"):
+        return requests.post(f"{BASE_URL}/api/tools/{tool}",
+                             files={"file": (name, data_bytes, "application/pdf")}, data=data or {})
+
+    def test_fake_pdf_detail(self):
+        r = self._post("compress", b"hello text")
+        assert r.status_code == 400
+        d = r.json()["detail"]
+        print("fake:", d)
+        assert isinstance(d, str) and len(d) > 5 and "unexpected" not in d.lower()
+
+    def test_corrupted_pdf(self):
+        r = self._post("compress", make_pdf(2)[:300])
+        print("corrupt:", r.status_code, r.text[:150])
+        assert r.status_code == 400
+
+    def test_encrypted_pdf(self):
+        doc = fitz.open(stream=make_pdf(2), filetype="pdf")
+        enc = doc.tobytes(encryption=fitz.PDF_ENCRYPT_AES_256, user_pw="u", owner_pw="o")
+        r = self._post("compress", enc)
+        print("encrypted:", r.status_code, r.text[:150])
+        assert r.status_code == 400 and "detail" in r.json()
+
+    def test_non_image_detail(self):
+        r = requests.post(f"{BASE_URL}/api/tools/jpg-to-pdf", files=[("files", ("a.jpg", b"notimage", "image/jpeg"))])
+        print("nonimg:", r.text[:150])
+        assert r.status_code == 400 and r.json().get("detail")
+
+    @pytest.mark.parametrize("tool,data", [
+        ("remove-pages", {"pages": "1-999999999"}),
+        ("split", {"mode": "ranges", "ranges": "1-999999999"}),
+        ("organize", {"order": "999999999,1,2"}),
+    ])
+    def test_huge_range_fast_400(self, tool, data):
+        import time
+        t = time.time()
+        r = self._post(tool, make_pdf(3), data)
+        el = time.time() - t
+        print(tool, r.status_code, round(el, 2), r.text[:120])
+        assert r.status_code == 400 and el < 10
+
+    def test_split_non_numeric_reversed(self):
+        for v in ("x", "3-1", "1-"):
+            r = self._post("split", make_pdf(3), {"mode": "ranges", "ranges": v})
+            assert r.status_code == 400, (v, r.text)
+
+    def test_compress_levels_differ(self):
+        src = make_photo_pdf(3)
+        sizes = {}
+        for lvl in ("low", "medium", "high"):
+            r = self._post("compress", src, {"level": lvl})
+            assert r.status_code == 200, r.text
+            c = download(r.json()).content
+            assert c[:5] == b"%PDF-"
+            assert len(PdfReader(io.BytesIO(c)).pages) == 3
+            assert len(c) <= len(src)
+            sizes[lvl] = len(c)
+        print("src", len(src), sizes)
+        assert sizes["high"] < sizes["medium"] < sizes["low"]
+
+    def test_compress_text_never_larger(self):
+        src = make_pdf(2)
+        r = self._post("compress", src, {"level": "high"})
+        c = download(r.json()).content
+        assert len(c) <= len(src) and c[:5] == b"%PDF-"
+
+    @pytest.mark.parametrize("path,needle", [("/sitemap.xml", "<urlset"), ("/robots.txt", "Sitemap"), ("/ads.txt", "")])
+    def test_static_files(self, path, needle):
+        r = requests.get(f"{BASE_URL}{path}")
+        print(path, r.status_code, r.headers.get("content-type"), r.text[:80])
+        assert r.status_code == 200 and "<div id=\"root\">" not in r.text
+        assert needle in r.text

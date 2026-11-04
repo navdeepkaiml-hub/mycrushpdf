@@ -1,0 +1,31 @@
+{
+  "summary": "Iteration 2 bug-fix retest. Backend: 48/48 pytest cases pass, the 35 original cases plus 13 new TestIter2 cases. The 7 cases that failed in iteration 1 now pass. A fake, corrupted or encrypted PDF, or a non-image sent to jpg-to-pdf, now returns 400 with a specific detail message. Non-numeric and reversed page specs return 400 for remove-pages, organize and split. A huge range (1-999999999) returns 400 in about 0.12s for all three tools. Compress on a 10.1MB image-heavy PDF: low 2.9MB, medium 530KB, high 107KB. Each output is a valid PDF with the same page count, and none is larger than its input. All 6 tools give correct output. /sitemap.xml, /robots.txt and /ads.txt are served from the preview URL. UI: a fake PDF upload shows 'File is not a valid PDF document.' in tool-error. A simulated 60MB file shows the 50MB limit error. Admin login, dashboard, session after reload, logout and the protected-route redirect all work. The mobile menu lists Remove PDF Pages and Organize PDF.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "client_ip (server.py) and login (auth.py)", "issue": "Both trust the FIRST X-Forwarded-For entry, which the client controls. An attacker can rotate the XFF header to get past the 5-failure lockout (the identifier is ip:email) and the slowapi rate limits. Use the last hop added by the trusted proxy, or key the lockout on email alone."},
+      {"endpoint": "Admin stats", "issue": "'Failed Jobs' includes 400 validation rejections (bad page spec, fake file), so user input errors inflate the failure stats. Consider tracking these separately. Low priority."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_mycrushpdf_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Deployment mismatch: firebase.json uses public='dist' and DEPLOYMENT.md says Vite / 'vite build' / dist/. The app is CRA/craco ('craco build' outputs build/). Change firebase.json public to 'build' and fix DEPLOYMENT.md, otherwise the deploy will publish an empty or missing folder.",
+    "Harden client IP detection so the lockout and rate limit cannot be bypassed by spoofing X-Forwarded-For (minor)."
+  ],
+  "critical_code_review_comments": [
+    "seed_admin inserts the admin only when missing and never overwrites the password (correct). bcrypt is used for hashing.",
+    "CORS allow_credentials is False when origins='*'. Same-origin cookie auth still works in the preview.",
+    "ToolRunner.addFiles: when several files are selected and some are over 50MB, only the last oversize name appears in the error. Acceptable."
+  ],
+  "updated_files": ["/app/backend/tests/test_mycrushpdf_api.py (added TestIter2 class: 13 cases)"],
+  "success_rate": {"backend": "100% (48/48)", "frontend": "100% (all requested flows)"},
+  "seed_data_creation": "None. Tool jobs created by the tests show up in the admin stats.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: REACT_APP_BACKEND_URL=<url> pytest /app/backend/tests/test_mycrushpdf_api.py. The tool page run button is data-testid='process-btn' and errors appear in 'tool-error'. Known accepted gaps, not retested: admin SEO tab not wired to pages; client-side-only meta."
+}
