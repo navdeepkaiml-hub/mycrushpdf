@@ -164,10 +164,10 @@ async function jpgToPdf(files) {
 }
 
 async function rasterize(bytes, scale, quality) {
-  const pdfjs = await import("pdfjs-dist/build/pdf");
-  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
   const { PDFDocument } = await import("pdf-lib");
-  const src = await pdfjs.getDocument({ data: bytes.slice() }).promise;
+  const src = await pdfjs.getDocument({ data: bytes.slice(), isEvalSupported: false }).promise;
   const out = await PDFDocument.create();
   for (let i = 1; i <= src.numPages; i++) {
     const page = await src.getPage(i);
