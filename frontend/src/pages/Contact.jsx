@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Send, Loader2, CheckCircle2, AlertCircle, MapPin } from "lucide-react";
 import Seo from "@/components/Seo";
+import { PAGE_META, ld } from "@/data/seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { api, formatApiError } from "@/lib/api";
 import { CONTACT_EMAIL } from "@/data/legal";
@@ -19,7 +20,7 @@ export default function Contact() {
       setStatus("sent");
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
-      setError(formatApiError(err.response?.data?.detail) || "Could not send your message.");
+      setError(err.response ? formatApiError(err.response.data?.detail) : `We could not send your message right now. Please email us at ${CONTACT_EMAIL}.`);
       setStatus("error");
     }
   };
@@ -31,11 +32,7 @@ export default function Contact() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <Seo
-        title="Contact Us — mycrushpdf"
-        description="Get in touch with the mycrushpdf team. Send us your questions, feedback or support requests and we'll get back to you."
-        path="/contact-us"
-      />
+      <Seo {...PAGE_META.contact} jsonLd={ld.breadcrumbs([{ name: "Contact Us", path: "/contact-us" }])} />
       <Breadcrumbs items={[{ label: "Contact Us" }]} />
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Contact Us</h1>
       <p className="mt-3 max-w-xl text-base text-slate-600">

@@ -2,6 +2,7 @@ import { useParams, Navigate } from "react-router-dom";
 import Seo from "@/components/Seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { LEGAL_PAGES } from "@/data/legal";
+import { ld } from "@/data/seo";
 
 function renderParagraph(text) {
   // auto-link URLs
@@ -23,7 +24,7 @@ export default function LegalPage({ pageKey: propKey }) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <Seo title={page.seoTitle} description={page.seoDescription} path={`/${pageKey}`} />
+      <Seo title={page.seoTitle} description={page.seoDescription} path={`/${pageKey}`} jsonLd={ld.breadcrumbs([{ name: page.title, path: `/${pageKey}` }])} />
       <Breadcrumbs items={[{ label: page.title }]} />
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{page.title}</h1>
       {page.updated && <p className="mt-2 text-sm text-slate-400">Last updated: {page.updated}</p>}

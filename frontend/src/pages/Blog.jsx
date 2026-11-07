@@ -1,17 +1,14 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import Seo from "@/components/Seo";
+import { PAGE_META, ld } from "@/data/seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ARTICLES } from "@/data/blog";
 
 export default function Blog() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <Seo
-        title="PDF Guides & Tips — mycrushpdf Blog"
-        description="Practical, original guides on merging, compressing, splitting, converting and organizing PDF files. Learn to work smarter with documents."
-        path="/blog"
-      />
+      <Seo {...PAGE_META.blog} jsonLd={ld.breadcrumbs([{ name: "Blog", path: "/blog" }])} />
       <Breadcrumbs items={[{ label: "Blog" }]} />
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">PDF Guides & Tips</h1>
       <p className="mt-3 max-w-2xl text-base text-slate-600">

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" role="img" aria-label="mycrushpdf">
+  <rect width="64" height="64" rx="16" fill="#5146E5"/>
+  <rect x="23" y="10" width="27" height="35" rx="5" fill="#FFFFFF" fill-opacity="0.35"/>
+  <path d="M19 17h17l11 11v21a5 5 0 0 1-5 5H19a5 5 0 0 1-5-5V22a5 5 0 0 1 5-5z" fill="#FFFFFF"/>
+  <path d="M36 17v7a4 4 0 0 0 4 4h7z" fill="#C9C5FF"/>
+  <path d="M20.5 33.5l6 5.5-6 5.5M40.5 33.5l-6 5.5 6 5.5" fill="none" stroke="#5146E5" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="78" y="43" font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="800" letter-spacing="-1">
+    <tspan fill="#111827">mycrush</tspan><tspan fill="#5146E5">pdf</tspan>
+  </text>
+</svg>

@@ -22,7 +22,7 @@ export const LEGAL_PAGES = {
     sections: [
       { h: null, p: ["mycrushpdf is a free online platform that helps people work with PDF documents quickly and securely. We build simple, reliable tools to merge, compress, split, convert, rotate and organize PDFs — no software installation and no account required for everyday use."] },
       { h: "Our mission", p: ["Document tasks should be simple. Our mission is to offer professional-grade PDF utilities that anyone can use from any device, with a clean interface and honest, transparent handling of files."] },
-      { h: "How we work", p: ["All processing happens on our server using trusted open-source libraries. Uploaded files are given random names, stored only as long as needed to complete your task, and automatically deleted within 60 minutes. We never store the contents of your documents in our database."] },
+      { h: "How we work", p: ["Our PDF tools run entirely in your web browser using trusted open-source libraries (pdf-lib, PDF.js and JSZip). Your files are read and processed on your own device and are not uploaded to our servers. When you close or refresh the page, the files and results are gone from the page memory."] },
       { h: "What we value", p: ["Speed, privacy and clarity. We avoid dark patterns, misleading buttons and intrusive popups. Tools do exactly what they say, and our content explains clearly what each tool can and cannot do."] },
       { h: "Contact", p: [`Questions or feedback? Reach us any time at ${CONTACT_EMAIL} or through our Contact page.`] },
     ],
@@ -36,15 +36,15 @@ export const LEGAL_PAGES = {
     sections: [
       { h: null, p: [`This Privacy Policy explains how ${SITE_NAME} ("we", "us") handles information when you use our website and tools. By using the site you agree to the practices described here.`] },
       { h: "Information we collect", p: [
-        "Uploaded files: documents and images you submit to use a tool. These are processed to deliver the requested result.",
+        "Files you select: documents and images you choose in a tool are processed in your browser and are not sent to us.",
         "Technical data: IP address, browser type, device information, and usage events collected via logs and analytics to keep the service secure and improve it.",
         "Contact data: the name, email and message you provide when you contact us.",
       ] },
-      { h: "Uploaded file processing and storage", p: [
-        "Files are processed on our server and given random, non-guessable names.",
-        "Files are temporarily stored only as needed to complete processing and allow download, and are automatically deleted within a maximum of 60 minutes.",
-        "A storage lifecycle rule provides an additional automatic cleanup safeguard.",
-        "We do not store the contents of your documents in our database, and we do not use document contents for analytics.",
+      { h: "How your files are processed", p: [
+        "The Merge, Compress, Split, Remove Pages, Organize, Rotate and JPG to PDF tools process files locally in your browser. The files you select are not uploaded to our servers.",
+        "The finished file is created in your browser's memory and saved to your device when you click Download. It is released when you leave or refresh the page.",
+        "Our servers may receive an anonymous usage event (the tool name and whether processing succeeded) to count tool usage. It does not include file names or file contents.",
+        "We do not see, store or analyze the contents of your documents.",
       ] },
       { h: "Cookies", p: ["We use essential cookies for security and, for administrators, authentication. We may use cookies to remember preferences and, in the future, to support analytics and advertising as described below. See our Cookie Policy for details."] },
       { h: "Analytics", p: ["We may use privacy-respecting analytics to understand aggregate usage, such as which tools are popular and where errors occur. Analytics data is aggregated and not used to identify you personally."] },
@@ -64,7 +64,7 @@ export const LEGAL_PAGES = {
       ] },
       { h: "Children", p: ["Our tools are intended for general audiences and not directed at children. We do not knowingly collect personal data from children."] },
       { h: "Policy updates", p: ["We may update this policy to reflect changes in our practices or the law. Material changes will be posted on this page with a new last-updated date."] },
-      { h: "Contact", p: [`For privacy questions or requests, email ${CONTACT_EMAIL}. Business details: ${BUSINESS.legalName}, ${BUSINESS.address}.`] },
+      { h: "Contact", p: [`For privacy questions or requests, email ${CONTACT_EMAIL}.`] },
     ],
   },
   "terms-and-conditions": {
@@ -121,8 +121,27 @@ export const LEGAL_PAGES = {
       { h: null, p: [`The information and tools provided by ${SITE_NAME} are offered in good faith and for general use.`] },
       { h: "Results and accuracy", p: ["We strive for reliable processing, but we do not guarantee that every file will convert or process perfectly. Complex or unusual documents may produce imperfect results. Always review output before relying on it."] },
       { h: "Not professional advice", p: ["Our blog and guides are for general information only and do not constitute legal, financial or professional advice."] },
-      { h: "Security", p: ["We apply reasonable security measures, including temporary storage with automatic deletion and random file names. However, no online service can promise absolute security. We do not claim end-to-end or zero-knowledge encryption. Do not upload documents you are not comfortable processing online."] },
+      { h: "Security", p: ["Our PDF tools process files in your browser, so your documents are not uploaded to our servers. However, no website can promise absolute security, for example if your own device or browser is compromised. Keep backups of your original files."] },
       { h: "External links", p: ["Our site may link to third-party websites. We are not responsible for their content or practices."] },
+    ],
+  },
+  "security": {
+    title: "Security & File Privacy",
+    seoTitle: "Security & File Privacy — How mycrushpdf Handles Your Files",
+    seoDescription:
+      "How mycrushpdf processes PDF files in your browser, what data reaches our servers, file limits and practical tips for handling sensitive documents.",
+    updated: "2026-06-15",
+    sections: [
+      { h: "Your files stay on your device", p: ["Merge, Compress, Split, Remove Pages, Organize, Rotate and JPG to PDF run inside your web browser using open-source libraries (pdf-lib, PDF.js and JSZip). Your files are processed on your own device and are not uploaded to our servers."] },
+      { h: "What reaches our servers", p: [
+        "The website itself (HTML, scripts, styles and images) is delivered over HTTPS.",
+        "An optional anonymous usage event records the tool name and whether processing succeeded. It never includes file names or file contents.",
+        "If you send a message through the Contact page, we receive the name, email and message you enter.",
+      ] },
+      { h: "Validation and limits", p: ["Files are checked before processing. PDFs must start with a valid PDF signature and images must be real JPG or PNG files. Each file can be up to 10 MB, PDFs up to 500 pages, and JPG to PDF accepts up to 20 images per batch. Password-protected PDFs are rejected with a clear message."] },
+      { h: "When you are done", p: ["Results are created in your browser's memory and saved only when you click Download. Closing or refreshing the tab releases them."] },
+      { h: "Tips for sensitive documents", p: ["Use an up-to-date browser, avoid shared or public computers for confidential files, and keep a backup of your original documents."] },
+      { h: "Report a problem", p: [`If you believe you have found a security issue, email ${CONTACT_EMAIL}.`] },
     ],
   },
   "help": {
@@ -133,8 +152,8 @@ export const LEGAL_PAGES = {
     updated: "2026-01-20",
     sections: [
       { h: "Getting started", p: ["Pick a tool from the homepage or the All Tools page, upload your file, set any options, and download the result. No account is needed for everyday use."] },
-      { h: "File limits", p: ["Each file can be up to 50MB and 500 pages. Password-protected PDFs must be unlocked before processing."] },
-      { h: "Downloads and expiry", p: ["After processing, your result is available to download for up to 60 minutes, after which it is automatically deleted. Download promptly and keep your originals."] },
+      { h: "File limits", p: ["Each file can be up to 10 MB and 500 pages. JPG to PDF accepts up to 20 JPG or PNG images per batch. Password-protected PDFs must be unlocked before processing."] },
+      { h: "Downloads", p: ["After processing, click Download to save the result to your device. The result only lives in your open browser tab, so download it before leaving or refreshing the page."] },
       { h: "Troubleshooting", p: [
         "If a file is rejected, confirm it is a valid, unlocked PDF or a supported image.",
         "If processing times out, try a smaller or less complex file.",

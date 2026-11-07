@@ -17,7 +17,7 @@ export const ARTICLES = [
       { type: "ol", items: [
         "Open the Merge PDF tool and drag your files into the upload area.",
         "Review the file cards and drag them to set the correct order.",
-        "Click Merge PDF to combine them on the server.",
+        "Click Merge PDF. Your browser combines them on your device.",
         "Download your single, merged PDF.",
       ] },
       { type: "h2", text: "Tips for a clean merge" },
@@ -27,7 +27,7 @@ export const ARTICLES = [
         "If the final file is large, run it through Compress PDF afterwards.",
       ] },
       { type: "h2", text: "Is merging safe?" },
-      { type: "p", text: "With mycrushpdf, files are processed on the server and automatically deleted within 60 minutes. Document contents are never stored in our database. Still, avoid uploading highly sensitive documents to any online tool unless you understand and accept the provider's handling practices." },
+      { type: "p", text: "With mycrushpdf, merging happens in your browser, so your files are not uploaded to our servers. As with any website, use an up-to-date browser and avoid shared computers for confidential documents." },
       { type: "p", text: "Ready to try it? Head to the Merge PDF tool and combine your first documents in seconds." },
     ],
   },
@@ -45,7 +45,7 @@ export const ARTICLES = [
       { type: "h2", text: "Why PDFs get large" },
       { type: "p", text: "Most of a PDF's weight comes from embedded images — especially scans and photos. Text and vector graphics are already compact. That is why an image-heavy brochure can be ten times larger than a text report with the same page count." },
       { type: "h2", text: "How compression works" },
-      { type: "p", text: "Compression optimizes the way images and data streams are stored. Images are re-encoded and, when appropriate, downsampled to a sensible resolution for screen reading, while text stays sharp. Choosing a stronger level reduces image resolution and quality more aggressively." },
+      { type: "p", text: "PDFs get large mainly because of high-resolution images and inefficient internal structure. On mycrushpdf, Less compression rewrites the file structure without touching content (lossless). Recommended and Strong compression render every page as an optimized JPEG image. That shrinks scans and photo-heavy files a lot, but text is no longer selectable, so keep your original if you need to copy or search text." },
       { type: "h2", text: "Choosing the right level" },
       { type: "ul", items: [
         "Less compression: best for documents you will print or that contain detailed images.",
@@ -134,6 +134,7 @@ export const ARTICLES = [
     readingTime: "5 min read",
     updated: "2026-01-18",
     tool: "organize-pdf",
+    tools: ["remove-pdf-pages"],
     body: [
       { type: "p", text: "A well-organized PDF reads better and looks more professional. Two tools make this easy: Organize PDF to rearrange pages, and Remove PDF Pages to delete the ones you don't want. This guide covers both." },
       { type: "h2", text: "Reordering pages" },

@@ -3,15 +3,12 @@ import { ArrowRight } from "lucide-react";
 import Seo from "@/components/Seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { TOOLS, CATEGORIES } from "@/data/tools";
+import { PAGE_META, ld } from "@/data/seo";
 
 export default function AllTools() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <Seo
-        title="All PDF Tools — Merge, Compress, Split, Convert | mycrushpdf"
-        description="Browse every free online PDF tool from mycrushpdf: merge, compress, split, remove pages, organize, JPG to PDF, PDF to Word and rotate."
-        path="/all-tools"
-      />
+      <Seo {...PAGE_META.allTools} jsonLd={ld.breadcrumbs([{ name: "All Tools", path: "/all-tools" }])} />
       <Breadcrumbs items={[{ label: "All Tools" }]} />
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">All PDF Tools</h1>
       <p className="mt-3 max-w-2xl text-base text-slate-600">

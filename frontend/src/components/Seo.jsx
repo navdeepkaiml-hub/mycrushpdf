@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-
-const SITE = "mycrushpdf";
-const BASE = "https://mycrushpdf.com";
+import { BASE, OG_IMAGE, graph } from "@/data/seo";
 
 function setMeta(attr, key, content) {
   if (!content) return;
@@ -24,45 +22,35 @@ function setLink(rel, href) {
   el.setAttribute("href", href);
 }
 
-function setJsonLd(id, data) {
-  let el = document.getElementById(id);
-  if (data) {
-    if (!el) {
-      el = document.createElement("script");
-      el.type = "application/ld+json";
-      el.id = id;
-      document.head.appendChild(el);
-    }
-    el.textContent = JSON.stringify(data);
-  } else if (el) {
-    el.remove();
+function setJsonLd(nodes) {
+  let el = document.getElementById("page-jsonld");
+  if (!nodes || !nodes.length) { if (el) el.remove(); return; }
+  if (!el) {
+    el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.id = "page-jsonld";
+    document.head.appendChild(el);
   }
+  el.textContent = JSON.stringify(graph(nodes));
 }
 
-// Client-side SEO head manager. The production Vite build uses react-helmet-async
-// + a prerender step (see DEPLOYMENT.md) so crawlers receive static metadata.
-export default function Seo({ title, description, path = "/", image, jsonLd, noindex }) {
+// Keeps head tags in sync during client-side navigation; the build prerender writes the same tags statically.
+export default function Seo({ title, description, path = "/", jsonLd, noindex }) {
+  const key = JSON.stringify(jsonLd || null);
   useEffect(() => {
-    const fullTitle = title || `${SITE} — All Your PDF Tools in One Place`;
     const canonical = `${BASE}${path === "/" ? "" : path}`;
-    document.title = fullTitle;
+    document.title = title;
     setMeta("name", "description", description);
     setMeta("name", "robots", noindex ? "noindex, nofollow" : "index, follow");
     setLink("canonical", canonical);
-    // Open Graph
-    setMeta("property", "og:title", fullTitle);
+    setMeta("property", "og:title", title);
     setMeta("property", "og:description", description);
-    setMeta("property", "og:type", "website");
     setMeta("property", "og:url", canonical);
-    setMeta("property", "og:site_name", SITE);
-    if (image) setMeta("property", "og:image", image);
-    // Twitter
-    setMeta("name", "twitter:card", image ? "summary_large_image" : "summary");
-    setMeta("name", "twitter:title", fullTitle);
+    setMeta("property", "og:image", OG_IMAGE);
+    setMeta("name", "twitter:title", title);
     setMeta("name", "twitter:description", description);
-    if (image) setMeta("name", "twitter:image", image);
-    setJsonLd("page-jsonld", jsonLd);
-  }, [title, description, path, image, jsonLd, noindex]);
-
+    setJsonLd(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, description, path, key, noindex]);
   return null;
 }

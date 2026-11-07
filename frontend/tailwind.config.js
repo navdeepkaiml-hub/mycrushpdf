@@ -14,7 +14,14 @@ module.exports = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
       },
+      fontFamily: {
+        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        brand: { DEFAULT: '#5146E5', dark: '#3F35C9' },
+        ink: '#111827',
+        surface: '#F8FAFF',
+        indigo: { 50: '#F0EFFF', 100: '#E2E0FD', 200: '#C9C5FB', 600: '#5146E5', 700: '#3F35C9' },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -57,6 +64,8 @@ module.exports = {
         }
       },
       keyframes: {
+        pop: { from: { opacity: '0', transform: 'translateY(4px) scale(.98)' }, to: { opacity: '1', transform: 'none' } },
+        rise: { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'none' } },
         'accordion-down': {
           from: {
             height: '0'
@@ -75,6 +84,8 @@ module.exports = {
         }
       },
       animation: {
+        pop: 'pop .16s ease-out',
+        rise: 'rise .5s ease-out both',
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out'
       }

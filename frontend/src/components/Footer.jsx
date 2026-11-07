@@ -1,76 +1,69 @@
 import { Link } from "react-router-dom";
-import { FileText } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 import { TOOLS } from "@/data/tools";
 
-const LEGAL = [
-  { to: "/about-us", label: "About Us" },
-  { to: "/contact-us", label: "Contact Us" },
-  { to: "/privacy-policy", label: "Privacy Policy" },
-  { to: "/terms-and-conditions", label: "Terms & Conditions" },
-  { to: "/cookie-policy", label: "Cookie Policy" },
-  { to: "/disclaimer", label: "Disclaimer" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/help", label: "Help Center" },
+const COLUMNS = [
+  { title: "Company", links: [
+    { to: "/about-us", label: "About Us" },
+    { to: "/contact-us", label: "Contact" },
+    { to: "/blog", label: "Blog" },
+    { to: "/faq", label: "FAQ" },
+    { to: "/help", label: "Help Center" },
+  ] },
+  { title: "Legal", links: [
+    { to: "/privacy-policy", label: "Privacy Policy" },
+    { to: "/terms-and-conditions", label: "Terms of Service" },
+    { to: "/cookie-policy", label: "Cookie Policy" },
+    { to: "/disclaimer", label: "Disclaimer" },
+    { to: "/security", label: "Security & File Privacy" },
+  ] },
+  { title: "Explore", links: [
+    { to: "/all-tools", label: "All PDF Tools" },
+    { href: "/sitemap.xml", label: "Sitemap" },
+  ] },
 ];
+
+const linkCls = "text-sm text-slate-500 transition-colors hover:text-brand";
 
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-slate-200 bg-slate-50">
+    <footer className="mt-24 border-t border-slate-200 bg-surface">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-white">
-                <FileText className="h-5 w-5" strokeWidth={2.5} />
-              </span>
-              <span className="text-lg font-extrabold tracking-tight text-slate-900">
-                mycrush<span className="text-indigo-600">pdf</span>
-              </span>
-            </Link>
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="lg:col-span-1">
+            <BrandLogo testId="footer-logo" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">
-              Free, fast and secure online PDF tools. Merge, compress, split and
-              convert documents right in your browser.
+              Free online PDF tools that run in your browser. Merge, compress, split, organize and convert PDFs without creating an account.
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">PDF Tools</h3>
+            <h2 className="text-sm font-semibold text-ink">PDF Tools</h2>
             <ul className="mt-4 space-y-2.5">
-              {TOOLS.slice(0, 6).map((t) => (
-                <li key={t.slug}>
-                  <Link to={`/${t.slug}`} data-testid={`footer-tool-${t.slug}`} className="text-sm text-slate-500 transition-colors hover:text-indigo-600">
-                    {t.name}
-                  </Link>
-                </li>
+              {TOOLS.map((t) => (
+                <li key={t.slug}><Link to={`/${t.slug}`} data-testid={`footer-tool-${t.slug}`} className={linkCls}>{t.name}</Link></li>
               ))}
             </ul>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-slate-900">Company</h3>
-            <ul className="mt-4 space-y-2.5">
-              {LEGAL.map((l) => (
-                <li key={l.to}>
-                  <Link to={l.to} data-testid={`footer-link-${l.to.replace(/\//g, "")}`} className="text-sm text-slate-500 transition-colors hover:text-indigo-600">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-slate-900">Resources</h3>
-            <ul className="mt-4 space-y-2.5">
-              <li><Link to="/all-tools" className="text-sm text-slate-500 hover:text-indigo-600">All Tools</Link></li>
-              <li><Link to="/blog" className="text-sm text-slate-500 hover:text-indigo-600">Blog & Guides</Link></li>
-              <li><Link to="/faq" className="text-sm text-slate-500 hover:text-indigo-600">FAQ</Link></li>
-              <li><Link to="/help" className="text-sm text-slate-500 hover:text-indigo-600">Help Center</Link></li>
-            </ul>
-          </div>
+          {COLUMNS.map((c) => (
+            <div key={c.title}>
+              <h2 className="text-sm font-semibold text-ink">{c.title}</h2>
+              <ul className="mt-4 space-y-2.5">
+                {c.links.map((l) => (
+                  <li key={l.label}>
+                    {l.href ? (
+                      <a href={l.href} data-testid="footer-link-sitemap" className={linkCls}>{l.label}</a>
+                    ) : (
+                      <Link to={l.to} data-testid={`footer-link-${l.to.slice(1)}`} className={linkCls}>{l.label}</Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
-          <p className="text-sm text-slate-500">© {new Date().getFullYear()} mycrushpdf. All rights reserved.</p>
-          <p className="text-xs text-slate-400">
-            Files are processed securely and deleted automatically within 60 minutes.
-          </p>
+        <div className="mt-12 flex flex-col gap-3 border-t border-slate-200 pt-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <p data-testid="footer-copyright">© {new Date().getFullYear()} mycrushpdf. All rights reserved.</p>
+          <p className="text-xs text-slate-400">PDF tools on this site process your files in your browser. Files are not uploaded to our servers.</p>
         </div>
       </div>
     </footer>

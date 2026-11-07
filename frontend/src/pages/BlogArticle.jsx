@@ -1,6 +1,7 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Calendar, ArrowRight, ArrowLeft } from "lucide-react";
 import Seo from "@/components/Seo";
+import { ld } from "@/data/seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AdSlot from "@/components/AdSlot";
 import { getArticle, ARTICLES } from "@/data/blog";
@@ -37,17 +38,7 @@ export default function BlogArticle() {
   const tool = article.tool ? getTool(article.tool) : null;
   const others = ARTICLES.filter((a) => a.slug !== slug).slice(0, 3);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.description,
-    datePublished: article.updated,
-    dateModified: article.updated,
-    author: { "@type": "Organization", name: "mycrushpdf Editorial Team" },
-    publisher: { "@type": "Organization", name: "mycrushpdf" },
-    mainEntityOfPage: `https://mycrushpdf.com/blog/${article.slug}`,
-  };
+  const jsonLd = [ld.article(article), ld.breadcrumbs([{ name: "Blog", path: "/blog" }, { name: article.title, path: `/blog/${article.slug}` }])];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">

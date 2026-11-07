@@ -216,6 +216,21 @@ async def contact(request: Request, data: ContactInput):
     return {"message": "Thanks for reaching out! We'll get back to you soon."}
 
 
+class UsageInput(BaseModel):
+    tool: str = Field(..., max_length=40)
+    ok: bool
+
+
+@api_router.post("/stats")
+@limiter.limit("60/minute")
+async def record_usage(request: Request, data: UsageInput):
+    if data.tool not in TOOLS:
+        raise HTTPException(status_code=400, detail="Unknown tool.")
+    await repo.increment_tool_stat(data.tool, "total")
+    await repo.increment_tool_stat(data.tool, "success" if data.ok else "failed")
+    return {"ok": True}
+
+
 # ---------------- Public config (which tools are enabled, SEO, ads) ----------------
 @api_router.get("/config/public")
 async def public_config():

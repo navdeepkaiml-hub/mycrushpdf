@@ -1,15 +1,14 @@
 import { useRef, useState } from "react";
 import { UploadCloud } from "lucide-react";
 
-export default function UploadZone({ accept, multiple, onFiles, testId = "upload-zone" }) {
+export default function UploadZone({ accept, multiple, onFiles, hint, testId = "upload-zone", compact = false }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragging(false);
-    const files = Array.from(e.dataTransfer.files || []);
-    if (files.length) onFiles(files);
+    onFiles(Array.from(e.dataTransfer.files || []));
   };
 
   return (
@@ -21,9 +20,10 @@ export default function UploadZone({ accept, multiple, onFiles, testId = "upload
       onDrop={handleDrop}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") inputRef.current?.click(); }}
-      className={`group cursor-pointer rounded-3xl border-2 border-dashed p-10 text-center transition-all sm:p-14 ${
-        dragging ? "border-indigo-500 bg-indigo-50" : "border-indigo-300 bg-indigo-50/40 hover:border-indigo-500 hover:bg-indigo-50"
+      aria-label={multiple ? "Choose files to upload" : "Choose a file to upload"}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
+      className={`group cursor-pointer rounded-2xl border-2 border-dashed text-center transition-colors ${compact ? "p-5" : "p-8 sm:p-12"} ${
+        dragging ? "border-brand bg-brand/10" : "border-brand/30 bg-surface hover:border-brand hover:bg-brand/5"
       }`}
     >
       <input
@@ -34,20 +34,24 @@ export default function UploadZone({ accept, multiple, onFiles, testId = "upload
         data-testid={`${testId}-input`}
         className="hidden"
         onChange={(e) => {
-          const files = Array.from(e.target.files || []);
-          if (files.length) onFiles(files);
+          onFiles(Array.from(e.target.files || []));
           e.target.value = "";
         }}
       />
-      <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 transition-transform group-hover:scale-105">
-        <UploadCloud className="h-8 w-8" />
-      </span>
-      <p className="mt-5 text-lg font-semibold text-slate-900">
-        {multiple ? "Drop your files here" : "Drop your file here"}
+      {!compact && (
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/25 transition-transform group-hover:-translate-y-0.5">
+          <UploadCloud className="h-7 w-7" aria-hidden="true" />
+        </span>
+      )}
+      <p className={`${compact ? "" : "mt-4"} text-base font-semibold text-ink`}>
+        {compact ? "+ Add more files" : multiple ? "Drop your files here" : "Drop your file here"}
       </p>
-      <p className="mt-1 text-sm text-slate-500">
-        or <span className="font-medium text-indigo-600">click to browse</span> from your device
-      </p>
+      {!compact && (
+        <p className="mt-1 text-sm text-slate-500">
+          or <span className="font-semibold text-brand">choose from your device</span>
+        </p>
+      )}
+      {hint && <p data-testid={`${testId}-hint`} className="mt-3 text-xs font-medium text-slate-500">{hint}</p>}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import "@/App.css";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import Layout from "@/components/Layout";
@@ -11,14 +12,16 @@ import LegalPage from "@/pages/LegalPage";
 import Contact from "@/pages/Contact";
 import FaqPage from "@/pages/FaqPage";
 import NotFound from "@/pages/NotFound";
-import AdminLogin from "@/pages/admin/AdminLogin";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
 import ProtectedRoute from "@/pages/admin/ProtectedRoute";
 import { TOOLS } from "@/data/tools";
 
+const AdminLogin = lazy(() => import("@/pages/admin/AdminLogin"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const lazyEl = (el) => <Suspense fallback={<div className="min-h-screen" />}>{el}</Suspense>;
+
 const LEGAL_KEYS = [
   "about-us", "privacy-policy", "terms-and-conditions",
-  "cookie-policy", "disclaimer", "help",
+  "cookie-policy", "disclaimer", "security", "help",
 ];
 
 const router = createBrowserRouter([
@@ -37,12 +40,12 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFound /> },
     ],
   },
-  { path: "/admin/login", element: <AdminLogin /> },
+  { path: "/admin/login", element: lazyEl(<AdminLogin />) },
   {
     path: "/admin/dashboard",
     element: (
       <ProtectedRoute>
-        <AdminDashboard />
+        {lazyEl(<AdminDashboard />)}
       </ProtectedRoute>
     ),
   },

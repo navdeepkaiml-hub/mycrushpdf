@@ -11,7 +11,7 @@ export const CATEGORIES = [
   { id: "edit", label: "Edit PDF" },
 ];
 
-export const TOOLS = [
+const ALL_TOOLS = [
   {
     slug: "merge-pdf",
     endpoint: "merge",
@@ -33,18 +33,18 @@ export const TOOLS = [
     steps: [
       "Upload two or more PDF files using the upload area or drag and drop.",
       "Drag the file cards to arrange them in your preferred order.",
-      "Click Merge PDF and let the server combine them.",
+      "Click Merge PDF. Your browser combines them on your device.",
       "Download your single merged PDF file.",
     ],
     formats: "Input: PDF. Output: a single PDF.",
     limitations:
-      "Files up to 50MB each and 500 pages per file. Password-protected PDFs must be unlocked first.",
+      "Files up to 10 MB each and 500 pages per file. Password-protected PDFs must be unlocked first.",
     example:
       "Combine a cover letter, a resume and a portfolio into one PDF before emailing a job application.",
     faqs: [
-      { q: "Is there a limit on how many PDFs I can merge?", a: "You can merge many files in one go, as long as each file is within the 50MB and 500-page limits." },
+      { q: "Is there a limit on how many PDFs I can merge?", a: "You can merge many files in one go, as long as each file is within the 10 MB and 500-page limits." },
       { q: "Will the quality change after merging?", a: "No. Merging copies pages as-is without recompressing text or images." },
-      { q: "Are my files kept private?", a: "Files are processed on our server and automatically deleted within 60 minutes. We never store document contents in our database." },
+      { q: "Are my files kept private?", a: "Yes. The file is processed in your own browser and is never uploaded to our servers." },
     ],
     related: ["organize-pdf", "split-pdf", "compress-pdf"],
   },
@@ -59,6 +59,7 @@ export const TOOLS = [
     accept: ".pdf",
     multiple: false,
     fileKind: "pdf",
+    optionNote: "Less compression keeps your PDF exactly as it is and only removes wasted space. Recommended and Strong compression turn each page into an optimized image, so text will no longer be selectable or searchable.",
     options: [
       {
         key: "level", type: "select", label: "Compression level", default: "medium",
@@ -73,7 +74,7 @@ export const TOOLS = [
     seoDescription:
       "Compress PDF files online to reduce size for email and upload. Choose a compression level to balance quality and file size. Free and secure.",
     intro:
-      "Compress PDF shrinks the size of your document by optimizing embedded images and streams, so it is easier to email, upload and store — while keeping it readable.",
+      "Compress PDF makes your document smaller so it is easier to email, upload and store. Everything happens in your browser: choose a light, lossless clean-up, or a stronger setting that re-renders each page as an optimized image.",
     steps: [
       "Upload a single PDF file.",
       "Choose a compression level that fits your needs.",
@@ -82,15 +83,15 @@ export const TOOLS = [
     ],
     formats: "Input: PDF. Output: an optimized PDF.",
     limitations:
-      "Files up to 50MB and 500 pages. Text-only PDFs may already be small and compress less.",
+      "Files up to 10 MB and 500 pages. Text-only PDFs may already be small and compress less.",
     example:
-      "Shrink a scanned 20MB contract so it fits under a 10MB email attachment limit.",
+      "Shrink a scanned 8 MB application form so it fits under a 2 MB upload limit on a government or job portal.",
     faqs: [
-      { q: "How much smaller will my PDF be?", a: "It depends on the content. Image-heavy PDFs compress a lot; text-only PDFs compress less because there is little to optimize." },
-      { q: "Will text stay sharp?", a: "Yes. Text and vector content stay crisp. Only embedded images are optimized based on the level you choose." },
+      { q: "How much smaller will my PDF be?", a: "It depends on the content. Scanned and photo-heavy PDFs usually shrink a lot. If a PDF cannot be made smaller, we return your original file unchanged and tell you." },
+      { q: "Will my text stay selectable?", a: "With Less compression, yes: the PDF is kept as-is. Recommended and Strong compression convert each page into an image, so text stays readable but can no longer be selected or searched." },
       { q: "Can I compress a scanned document?", a: "Yes. Scanned PDFs are mostly images, so they usually see the biggest size reduction." },
     ],
-    related: ["merge-pdf", "split-pdf", "pdf-to-word"],
+    related: ["merge-pdf", "split-pdf", "rotate-pdf"],
   },
   {
     slug: "split-pdf",
@@ -130,7 +131,7 @@ export const TOOLS = [
       "Download a ZIP containing all the resulting PDF files.",
     ],
     formats: "Input: PDF. Output: a ZIP archive of PDF files.",
-    limitations: "Files up to 50MB and 500 pages. Ranges must be within the document's page count.",
+    limitations: "Files up to 10 MB and 500 pages. Ranges must be within the document's page count.",
     example: "Extract chapters 1–3 and 4–6 of an ebook into two separate PDFs.",
     faqs: [
       { q: "How are split files delivered?", a: "All resulting PDFs are bundled into a single ZIP file for easy download." },
@@ -169,7 +170,7 @@ export const TOOLS = [
       "Download the edited PDF.",
     ],
     formats: "Input: PDF. Output: a PDF without the removed pages.",
-    limitations: "Files up to 50MB and 500 pages. You cannot remove every page.",
+    limitations: "Files up to 10 MB and 500 pages. You cannot remove every page.",
     example: "Delete blank pages 2 and 7 from a scanned document before sharing it.",
     faqs: [
       { q: "How do I specify pages?", a: "Enter page numbers or ranges separated by commas, such as 2, 5, 8-10." },
@@ -208,7 +209,7 @@ export const TOOLS = [
       "Download the reorganized PDF.",
     ],
     formats: "Input: PDF. Output: a reordered PDF.",
-    limitations: "Files up to 50MB and 500 pages. Every page number must be within range.",
+    limitations: "Files up to 10 MB and 500 pages. Every page number must be within range.",
     example: "Move a signature page to the front by entering 5, 1, 2, 3, 4.",
     faqs: [
       { q: "How do I set the order?", a: "Enter every page number once, in the sequence you want, separated by commas." },
@@ -225,14 +226,14 @@ export const TOOLS = [
     category: "convert",
     icon: ImageIcon,
     color: "#10B981",
-    accept: "image/*",
+    accept: ".jpg,.jpeg,.png,image/jpeg,image/png",
     multiple: true,
     minFiles: 1,
     fileKind: "image",
     options: [],
     seoTitle: "JPG to PDF — Convert Images to PDF Online Free | mycrushpdf",
     seoDescription:
-      "Convert JPG, PNG and other images into a single PDF online. Combine multiple photos into one document. Free, fast and secure.",
+      "Convert JPG and PNG images into a single PDF online. Combine multiple photos into one document. Free, fast and secure.",
     intro:
       "JPG to PDF turns your images into a clean PDF document. Upload one or many photos, arrange them, and download them as a single PDF — perfect for IDs, receipts and scans.",
     steps: [
@@ -241,18 +242,19 @@ export const TOOLS = [
       "Click Convert to PDF to build the document.",
       "Download your images as a single PDF.",
     ],
-    formats: "Input: JPG, PNG and common image formats. Output: a single PDF.",
-    limitations: "Each image up to 50MB. Very large images are placed at their native size.",
+    formats: "Input: JPG and PNG images. Output: a single PDF.",
+    limitations: "Up to 20 JPG or PNG images per batch, each up to 10 MB. Each image becomes one page at its native size.",
     example: "Combine photos of a receipt, an ID card and a form into one PDF for an application.",
     faqs: [
-      { q: "Which image formats are supported?", a: "JPG and PNG are fully supported, along with most common image formats readable by the server." },
+      { q: "Which image formats are supported?", a: "JPG and PNG are supported. Convert other formats such as HEIC or WebP to JPG first." },
       { q: "Can I control the page order?", a: "Yes. Drag the image cards to arrange them before converting." },
       { q: "Does each image become a page?", a: "Yes. Every uploaded image becomes one page in the resulting PDF." },
     ],
-    related: ["merge-pdf", "compress-pdf", "pdf-to-word"],
+    related: ["merge-pdf", "compress-pdf", "rotate-pdf"],
   },
   {
     slug: "pdf-to-word",
+    serverOnly: true,
     endpoint: "pdf-to-word",
     name: "PDF to Word",
     tagline: "Convert PDF into an editable Word document",
@@ -271,7 +273,7 @@ export const TOOLS = [
     steps: [
       "Upload the PDF you want to convert.",
       "Click Convert to Word to start processing.",
-      "Wait while the server rebuilds the document as DOCX.",
+      "Wait while the document is rebuilt as DOCX.",
       "Download your editable Word file.",
     ],
     formats: "Input: PDF with selectable text. Output: Word .docx.",
@@ -322,7 +324,7 @@ export const TOOLS = [
       "Click Rotate PDF and download the corrected file.",
     ],
     formats: "Input: PDF. Output: a rotated PDF.",
-    limitations: "Files up to 50MB and 500 pages.",
+    limitations: "Files up to 10 MB and 500 pages.",
     example: "Rotate a landscape scan 90° so it displays upright on every device.",
     faqs: [
       { q: "Can I rotate only some pages?", a: "Yes. Enter the specific pages or ranges, or leave the field blank to rotate all pages." },
@@ -332,6 +334,9 @@ export const TOOLS = [
     related: ["organize-pdf", "merge-pdf", "split-pdf"],
   },
 ];
+
+// PDF to Word needs a server converter, so it stays hidden on the free static deployment.
+export const TOOLS = ALL_TOOLS.filter((t) => !t.serverOnly);
 
 export const POPULAR_SLUGS = ["merge-pdf", "compress-pdf", "split-pdf", "remove-pdf-pages", "organize-pdf", "jpg-to-pdf"];
 
