@@ -12,6 +12,8 @@ Secure, fast, SEO-friendly online PDF utility platform. Phase 1 tools with real 
 - 2026-06: Phase 1 tools (Merge, Compress, Split, Remove Pages, Organize, JPG to PDF), admin, blog, legal, SEO, deployment docs
 - 2026-06 (QA pass): ProcessingError→400 handler; safe page-spec parsing (non-numeric, reversed and huge ranges); real image recompression in Compress with levels that differ; oversize error shown in UI; CORS credentials disabled for wildcard; lockout keyed by email; rate limiter uses proxy IP; no hardcoded admin password; mobile menu lists Phase 1 tools; static SEO files; firebase public dir fixed. Tests: 48/48 backend, all UI flows pass (iteration_2).
 
+- 2026-06 Search-Ready Pages: `yarn build` runs scripts/prerender.js and writes build/<route>.html (24 pages) with per-page title, description, canonical, OG/Twitter tags and JSON-LD (served via Firebase cleanUrls). Verified in iteration_3 (100%).
+
 ## Backlog
-- P1: Rotate PDF and PDF to Word (backend endpoints exist, not QA'd), prerendering for crawlers, wire the admin SEO tab to the pages
+- P1: Rotate PDF and PDF to Word (backend endpoints exist, not QA'd), wire the admin SEO tab to the pages, FAQ JSON-LD in prerendered /faq and tool pages
 - P2: OCR, Word to PDF, PDF to JPG, Protect PDF; AdSense activation once a Publisher ID is available; separate 'rejected' from 'failed' stats
