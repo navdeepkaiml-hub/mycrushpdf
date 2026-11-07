@@ -1,0 +1,41 @@
+{
+  "summary": "I tested the browser-side PDF tools end to end on the preview URL using real fixture files. I checked every downloaded output with pypdf. All 7 tools work: Merge (order follows move-up/down: C,B,A), Compress (low/medium/high on a 7.3 MB file gave 7.29 MB, 785 KB and 272 KB, same page count; on a small PDF the original is returned unchanged and result-note is shown), Split (all -> 3 PDFs; '1-2,3' -> 2 PDFs), Remove Pages, Organize ('3,1,2'), JPG to PDF (JPG/PNG mix in order; 20 images -> 20 pages) and Rotate (90 on all pages). All limit messages match the required text exactly: empty, >10 MB, unsupported .docx/.txt, 21 images, fake PDF and encrypted PDF. '20 of 20 images selected' is shown, and removing a file then adding another works. Header, homepage section order, footer links, 404 for /pdf-to-word, refresh on deep links, the mobile menu and no horizontal overflow at 390/768 px all pass. The production build prints 'Prerendered 24 pages + sitemap.xml'. All 24 HTML pages have a unique title, one meta description, one canonical, og:image, valid JSON-LD and crawlable h1 text and links. The sitemap lists 24 URLs with no admin URLs, robots.txt is correct and all favicon/icon files exist (og-image is 1200x630). A static serve of the build works with all /api calls blocked (tested compress medium and merge). Backend: /api/stats and admin login/overview pass (7/7). Issues: every public page logs a 401 console error, mouse-clicking 'All Tools' closes the menu, and unknown URLs are a soft 404.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/stats", "issue": "User input errors ('abc' pages, wrong file type, encrypted PDF) are recorded as failed jobs, which makes the admin failure stats look worse than they are."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Header ToolsDropdown", "issue": "Clicking 'All Tools' with a mouse closes the menu. Hovering already opens it (onMouseEnter), so the click then toggles it shut and aria-expanded ends up false. Enter and Escape on the keyboard work.", "selector": "[data-testid='nav-all-tools-trigger']", "priority": "MEDIUM"},
+      {"component": "AuthContext", "issue": "Every public page calls GET /api/auth/me, which returns 401 and logs 'Failed to load resource: 401' in the console. This breaks the 'no console errors on main routes' requirement. Only call /auth/me on /admin routes.", "selector": "src/context/AuthContext.jsx:10", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/jpg-to-pdf how-to steps", "issues": ["Step 2 says 'Drag the image cards' but reordering only uses up/down arrows. Step 3 says 'Click Convert to PDF' but the button is labelled 'JPG to PDF'."]},
+      {"screen": "/rotate-pdf", "issues": ["The 'Helpful guides' section is missing; the other 6 tool pages have it."]},
+      {"screen": "Admin overview", "issues": ["Shows a raw 'pdf-to-word' row because the hidden tool has no label."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_iteration4_stats_admin.py", "/app/tests/make_fixtures.py", "/app/tests/verify_downloads.py", "/app/tests/seo_build_audit.py", "/app/test_reports/pytest/iteration4.xml"],
+  "action_items": [
+    "Fix the ToolsDropdown hover+click conflict: make onClick open the menu when hover already opened it, or drop the hover-open behaviour.",
+    "Stop calling /api/auth/me outside /admin routes so public pages have no console errors.",
+    "Soft 404: firebase.json rewrites '**' to /app.html, which has robots 'index, follow' and no canonical. Unknown URLs return HTTP 200. Add noindex to app.html (or prerender a 404.html and only rewrite /admin/**).",
+    "The production bundle has REACT_APP_BACKEND_URL baked in as the preview URL. On Firebase, /api/stats, /api/config/public and the admin pages would hit the preview backend cross-origin. Set the production backend URL (or remove these calls) before deploying.",
+    "Fix the jpg-to-pdf how-to wording and add helpful guides to /rotate-pdf."
+  ],
+  "critical_code_review_comments": [
+    "ToolRunner.addFiles reads the stale 'files' closure instead of a functional setState. This is fine for one input at a time, but quick repeated drops could lose files.",
+    "When a selection has both an unsupported file and too many images, only the last error is shown.",
+    "Organize accepts duplicate or missing pages (e.g. '1,1'), which silently drops or duplicates pages. Consider warning the user.",
+    "/api/config/public is fetched twice per page load."
+  ],
+  "updated_files": ["/app/backend/tests/test_iteration4_stats_admin.py", "/app/tests/make_fixtures.py", "/app/tests/verify_downloads.py", "/app/tests/seo_build_audit.py"],
+  "success_rate": {"backend": "100%", "frontend": "94%"},
+  "seed_data_creation": "No DB seed data. Fixtures are generated into /tmp/fx by /app/tests/make_fixtures.py. Tests added a few /api/stats counter increments.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run 'python3 /app/tests/make_fixtures.py' to create the fixtures, then run the Playwright flows (downloads saved to /tmp/dl) and 'python3 /app/tests/verify_downloads.py'. Run seo_build_audit.py after 'CI=false yarn build'. Header nav testids are nav-merge, nav-compress, nav-split, nav-jpg-to-pdf and nav-blog (not nav-merge-pdf). The admin stats endpoint is /api/admin/overview."
+}

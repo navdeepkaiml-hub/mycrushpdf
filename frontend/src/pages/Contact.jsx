@@ -20,7 +20,8 @@ export default function Contact() {
       setStatus("sent");
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (err) {
-      setError(err.response ? formatApiError(err.response.data?.detail) : `We could not send your message right now. Please email us at ${CONTACT_EMAIL}.`);
+      const detail = err.response?.data?.detail;
+      setError(detail ? formatApiError(detail) : `We could not send your message right now. Please email us at ${CONTACT_EMAIL}.`);
       setStatus("error");
     }
   };

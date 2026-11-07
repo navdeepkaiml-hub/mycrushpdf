@@ -90,8 +90,11 @@ for (const p of pages) {
   fs.writeFileSync(out, render(p));
 }
 
-// SPA fallback for unknown and admin routes: generic head, noindex, no canonical.
-fs.writeFileSync(path.join(BUILD, "app.html"), template.replace('<meta name="robots" content="index, follow" />', '<meta name="robots" content="noindex" />'));
+// Admin SPA shell and real-404 page: generic head with noindex.
+const noindex = template.replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex"/>');
+if (noindex === template) throw new Error("robots meta not found in template");
+fs.writeFileSync(path.join(BUILD, "app.html"), noindex);
+fs.writeFileSync(path.join(BUILD, "404.html"), noindex.replace(/<title>[\s\S]*?<\/title>/, "<title>Page Not Found | mycrushpdf</title>"));
 
 const today = new Date().toISOString().slice(0, 10);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages

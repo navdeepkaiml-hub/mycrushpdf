@@ -32,7 +32,7 @@ function ToolsDropdown() {
         data-testid="nav-all-tools-trigger"
         aria-expanded={open}
         aria-controls="tools-menu"
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => (e.detail === 0 ? setOpen((v) => !v) : setOpen(true))}
         className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-ink"
       >
         All Tools <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />

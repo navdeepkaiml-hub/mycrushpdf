@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [admin, setAdmin] = useState(null); // null = checking, false = unauth, object = admin
   useEffect(() => {
+    if (!window.location.pathname.startsWith("/admin")) { setAdmin(false); return; }
     api
       .get("/auth/me")
       .then((r) => setAdmin(r.data))

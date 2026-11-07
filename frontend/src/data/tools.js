@@ -32,7 +32,7 @@ const ALL_TOOLS = [
       "Merge PDF lets you combine several PDF documents into one organized file in seconds. Drop your files, arrange them in the order you want and download a single merged PDF.",
     steps: [
       "Upload two or more PDF files using the upload area or drag and drop.",
-      "Drag the file cards to arrange them in your preferred order.",
+      "Use the up and down arrows on each file to arrange them in your preferred order.",
       "Click Merge PDF. Your browser combines them on your device.",
       "Download your single merged PDF file.",
     ],
@@ -238,8 +238,8 @@ const ALL_TOOLS = [
       "JPG to PDF turns your images into a clean PDF document. Upload one or many photos, arrange them, and download them as a single PDF — perfect for IDs, receipts and scans.",
     steps: [
       "Upload one or more JPG or PNG images.",
-      "Drag the image cards to set the page order.",
-      "Click Convert to PDF to build the document.",
+      "Use the up and down arrows on each image to set the page order.",
+      "Click JPG to PDF to build the document in your browser.",
       "Download your images as a single PDF.",
     ],
     formats: "Input: JPG and PNG images. Output: a single PDF.",
@@ -247,7 +247,7 @@ const ALL_TOOLS = [
     example: "Combine photos of a receipt, an ID card and a form into one PDF for an application.",
     faqs: [
       { q: "Which image formats are supported?", a: "JPG and PNG are supported. Convert other formats such as HEIC or WebP to JPG first." },
-      { q: "Can I control the page order?", a: "Yes. Drag the image cards to arrange them before converting." },
+      { q: "Can I control the page order?", a: "Yes. Use the up and down arrows on each image to arrange them before converting." },
       { q: "Does each image become a page?", a: "Yes. Every uploaded image becomes one page in the resulting PDF." },
     ],
     related: ["merge-pdf", "compress-pdf", "rotate-pdf"],

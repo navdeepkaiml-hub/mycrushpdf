@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import UploadZone from "@/components/UploadZone";
-import { LIMITS, MESSAGES, checkFile, runTool } from "@/lib/pdfTools";
+import { LIMITS, MESSAGES, ToolError, checkFile, runTool } from "@/lib/pdfTools";
 
 function humanSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -123,7 +123,7 @@ export default function ToolRunner({ tool }) {
     } catch (e) {
       setError(e.message || "Processing failed. Please try again.");
       setStatus("error");
-      reportUsage(tool.endpoint, false);
+      if (!(e instanceof ToolError)) reportUsage(tool.endpoint, false);
     }
   };
 
