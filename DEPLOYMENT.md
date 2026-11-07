@@ -27,7 +27,7 @@ firebase deploy --only hosting
 1. Firebase console → Hosting → Add custom domain `mycrushpdf.com`. Then add `www.mycrushpdf.com` and choose **Redirect to mycrushpdf.com**. This gives one canonical host with HTTPS certificates managed by Firebase.
 2. Fill the `[CONFIG: …]` placeholders in `frontend/src/data/legal.js` (`BUSINESS`) with real information, or leave them unused. They are not shown publicly.
 3. Confirm `support@mycrushpdf.com` is a working inbox, or change `CONTACT_EMAIL` in `legal.js`.
-4. Optional: replace `public/og-image.png` by regenerating it with `python3 frontend/scripts/make_icons.py` after any logo change.
+4. Optional: replace `public/og-image.png` and all logo/favicon files by running `python3 frontend/scripts/build_brand.py <PlusJakartaSans[wght].ttf>` (free font from Google Fonts) after any logo change.
 
 ## Google Search Console
 1. Go to https://search.google.com/search-console and choose **Add property → Domain**, then enter `mycrushpdf.com`.

@@ -6,7 +6,7 @@ A secure, fast, SEO-friendly online PDF utility platform with a premium brand. I
 ## Architecture (as of 2026-06)
 - Frontend: React (CRA + craco) + Tailwind. PDF tools run **in the browser** (src/lib/pdfTools.js, using pdf-lib, PDF.js and JSZip, loaded lazily). Limits: 10 MB per file, 20 images per batch, 500 pages.
 - SEO: src/data/seo.js holds page metadata and JSON-LD builders. `yarn build` runs scripts/prerender.js, which writes 24 route HTML files (head + crawlable body + JSON-LD), 404.html/app.html (noindex) and sitemap.xml.
-- Brand: public/logo.svg, logo-mark.svg, favicons, PWA icons and og-image.png. Regenerate them with scripts/make_icons.py.
+- Brand: "split page" mark (a document with a clipped corner, divided by a rising diagonal gap). Assets live in public/brand/*.svg (logo, light, dark, black, white, symbol, symbol-mono), plus favicon.svg/.ico/16/32, apple-touch-icon, icon-192/512 and og-image.png. The wordmark is Plus Jakarta Sans 600 converted to outlines. Regenerate with scripts/build_brand.py <font.ttf>.
 - Backend (FastAPI + MongoDB, optional and not on Spark): admin dashboard, contact inbox, /api/stats usage counts. The old /api/tools/* endpoints are unused by the frontend.
 - firebase.json: public=build, cleanUrls, only /admin/** rewritten to app.html, security headers.
 
