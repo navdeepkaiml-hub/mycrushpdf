@@ -1,19 +1,27 @@
 # mycrushpdf.com — PRD
 
 ## Problem statement
-Secure, fast, SEO-friendly online PDF utility platform. Phase 1 tools with real server-side processing (PyMuPDF, pypdf, Pillow), homepage with drag-and-drop, blog (5 articles), legal/privacy pages, contact, FAQ, protected admin dashboard. Preview uses the existing React (CRA) app plus FastAPI and MongoDB. Production plan: Firebase Hosting, optional Cloud Run (not activated). Budget-constrained user.
+A secure, fast, SEO-friendly online PDF utility platform with a premium brand. It must stay deployable on Firebase Hosting's free Spark plan, with no paid services. The user is budget-constrained.
 
-## Architecture
-- backend: FastAPI (server.py, pdf_processing.py, storage.py, auth.py, db.py), JWT cookie auth, slowapi rate limits, 60-min file expiry (cleanup every 60s)
-- frontend: React + Tailwind + Shadcn, Seo component (client-side meta/JSON-LD), static sitemap.xml/robots.txt/ads.txt in public/
-- firebase.json: public=build, SPA fallback, /api/** → Cloud Run (only if created)
+## Architecture (as of 2026-06)
+- Frontend: React (CRA + craco) + Tailwind. PDF tools run **in the browser** (src/lib/pdfTools.js, using pdf-lib, PDF.js and JSZip, loaded lazily). Limits: 10 MB per file, 20 images per batch, 500 pages.
+- SEO: src/data/seo.js holds page metadata and JSON-LD builders. `yarn build` runs scripts/prerender.js, which writes 24 route HTML files (head + crawlable body + JSON-LD), 404.html/app.html (noindex) and sitemap.xml.
+- Brand: public/logo.svg, logo-mark.svg, favicons, PWA icons and og-image.png. Regenerate them with scripts/make_icons.py.
+- Backend (FastAPI + MongoDB, optional and not on Spark): admin dashboard, contact inbox, /api/stats usage counts. The old /api/tools/* endpoints are unused by the frontend.
+- firebase.json: public=build, cleanUrls, only /admin/** rewritten to app.html, security headers.
 
 ## Implemented
-- 2026-06: Phase 1 tools (Merge, Compress, Split, Remove Pages, Organize, JPG to PDF), admin, blog, legal, SEO, deployment docs
-- 2026-06 (QA pass): ProcessingError→400 handler; safe page-spec parsing (non-numeric, reversed and huge ranges); real image recompression in Compress with levels that differ; oversize error shown in UI; CORS credentials disabled for wildcard; lockout keyed by email; rate limiter uses proxy IP; no hardcoded admin password; mobile menu lists Phase 1 tools; static SEO files; firebase public dir fixed. Tests: 48/48 backend, all UI flows pass (iteration_2).
-
-- 2026-06 Search-Ready Pages: `yarn build` runs scripts/prerender.js and writes build/<route>.html (24 pages) with per-page title, description, canonical, OG/Twitter tags and JSON-LD (served via Firebase cleanUrls). Verified in iteration_3 (100%).
+- Phase 1 MVP: 6 tools, admin, blog (5 articles), legal pages, deployment docs
+- QA pass: error handling, compression fix, security hardening (iterations 1–2)
+- Search-ready pages, head-only prerender (iteration 3)
+- 2026-06 Redesign + browser tools + technical SEO (iterations 4–5 at 100%):
+  - New logo and icon set, header with an accessible dropdown, footer, homepage with 10 sections, richer tool pages
+  - All 7 tools (Merge, Compress, Split, Remove, Organize, Rotate, JPG to PDF) moved to the browser
+  - Exact upload-limit messages
+  - Security & File Privacy page; legal text updated to match browser processing
+  - Prerendered body content, JSON-LD @graph (Organization, WebSite, WebApplication, FAQPage, BreadcrumbList, BlogPosting), auto sitemap, real 404, source maps off
+  - PDF to Word hidden (needs a server)
 
 ## Backlog
-- P1: Rotate PDF and PDF to Word (backend endpoints exist, not QA'd), wire the admin SEO tab to the pages, FAQ JSON-LD in prerendered /faq and tool pages
-- P2: OCR, Word to PDF, PDF to JPG, Protect PDF; AdSense activation once a Publisher ID is available; separate 'rejected' from 'failed' stats
+- P1: 5 new blog articles (deferred by the user); cookie consent banner before GA4/AdSense; admin SEO tab not wired to pages
+- P2: PDF to Word in the browser (limited) or other new tools; organize duplicate-page warning; Lighthouse audit on the deployed site; WebP for images; separate admin labels for hidden tools

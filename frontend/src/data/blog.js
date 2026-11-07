@@ -16,7 +16,7 @@ export const ARTICLES = [
       { type: "h2", text: "Step-by-step: merging PDFs" },
       { type: "ol", items: [
         "Open the Merge PDF tool and drag your files into the upload area.",
-        "Review the file cards and drag them to set the correct order.",
+        "Review the file cards and use the up and down arrows to set the correct order.",
         "Click Merge PDF. Your browser combines them on your device.",
         "Download your single, merged PDF.",
       ] },
@@ -112,7 +112,7 @@ export const ARTICLES = [
       { type: "h2", text: "Step-by-step" },
       { type: "ol", items: [
         "Open the JPG to PDF tool and upload your images.",
-        "Drag the image cards to set the page order.",
+        "Use the up and down arrows on each image to set the page order.",
         "Click Convert to PDF.",
         "Download the single combined PDF.",
       ] },
