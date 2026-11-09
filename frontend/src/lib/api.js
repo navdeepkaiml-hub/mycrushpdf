@@ -1,9 +1,22 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-// On any other host (e.g. the static Firebase site) only same-origin /api is used, never the preview backend.
-const sameHost = typeof window === "undefined" || window.location.origin === new URL(BACKEND_URL).origin;
-export const API = sameHost ? `${BACKEND_URL}/api` : "/api";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
+
+// Use the configured backend only when it is valid and belongs to this host.
+let sameHost = false;
+
+if (BACKEND_URL) {
+  try {
+    sameHost =
+      typeof window === "undefined" ||
+      window.location.origin === new URL(BACKEND_URL).origin;
+  } catch {
+    sameHost = false;
+  }
+}
+
+export const API =
+  BACKEND_URL && sameHost ? `${BACKEND_URL}/api` : "/api";
 
 export const api = axios.create({ baseURL: API, withCredentials: true });
 
