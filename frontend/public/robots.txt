@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://mycrushpdf.com/sitemap.xml
+Sitemap: https://mycrushpdf.web.app/sitemap.xml
