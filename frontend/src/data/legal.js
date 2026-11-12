@@ -2,7 +2,7 @@
 // business info that must be filled before publishing.
 export const CONTACT_EMAIL = "support@mycrushpdf.com";
 export const SITE_NAME = "mycrushpdf";
-export const SITE_URL = "https://mycrushpdf.com";
+export const SITE_URL = "https://mycrushpdf.web.app";
 
 // Placeholders — replace before going live. Do NOT invent these values.
 export const BUSINESS = {
