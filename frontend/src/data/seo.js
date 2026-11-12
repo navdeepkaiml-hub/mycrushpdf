@@ -1,5 +1,5 @@
 // Single source for page metadata and JSON-LD, used by pages and the build-time prerender.
-export const BASE = "https://mycrushpdf.com";
+export const BASE = "https://mycrushpdf.web.app";
 export const OG_IMAGE = `${BASE}/og-image.png`;
 
 export const PAGE_META = {
